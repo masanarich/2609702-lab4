@@ -1,22 +1,11 @@
-// Required: Use async/await OR .then() for API calls
-// Required: Use try/catch OR .catch() for error handling
+// REST Countries endpoints
+const NAME_ENDPOINT = "https://restcountries.com/v3.1/name/";
+const CODE_ENDPOINT = "https://restcountries.com/v3.1/alpha/";
 
-async function searchCountry(countryName) {
-    try {
-        // Show loading spinner
-        // Fetch country data
-        // Update DOM
-        // Fetch bordering countries
-        // Update bordering countries section
-    } catch (error) {
-        // Show error message
-    } finally {
-        // Hide loading spinner
-    }
-}
-
-// Event listeners
-document.getElementById('search-btn').addEventListener('click', () => {
-    const country = document.getElementById('country-input').value;
-    searchCountry(country);
-});
+// DOM elements (Required: getElementById or querySelector usage)
+const inputEl = document.getElementById("country-input");
+const btnEl = document.getElementById("search-btn");
+const spinnerEl = document.getElementById("loading-spinner");
+const countryInfoEl = document.getElementById("country-info");
+const bordersEl = document.getElementById("bordering-countries");
+const errorEl = document.getElementById("error-message");
