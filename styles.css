@@ -1,0 +1,22 @@
+.spinner {
+    /* Your styling */
+    animation: spin 1s linear infinite;
+    /* Required */
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.border-grid {
+    display: grid;
+    /* or display: flex */
+    /* Additional layout properties */
+}
+
