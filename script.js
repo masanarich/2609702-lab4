@@ -46,4 +46,43 @@ function normalizeCountryFromApi(country) {
     };
 }
 
+function renderCountryInfo(country) {
+    countryInfoEl.innerHTML = `
+        <div class="country-top">
+            <div class="country-title">
+                <h2>${country.commonName}</h2>
+                <p><strong>Official name:</strong> ${country.officialName}</p>
+                <p><strong>Capital:</strong> ${country.capital}</p>
+                <p><strong>Population:</strong> ${country.population.toLocaleString()}</p>
+                <p><strong>Region:</strong> ${country.region}</p>
+            </div>
+            ${country.flagSvg
+            ? `<img class="flag" src="${country.flagSvg}" alt="${country.flagAlt}">`
+            : `<p class="note">Flag not available.</p>`
+        }
+        </div>
+    `;
+    show(countryInfoEl);
+}
+
+
+
+function renderCountryInfo(country) {
+    countryInfoEl.innerHTML = `
+        <div class="country-top">
+            <div class="country-title">
+                <h2>${country.commonName}</h2>
+                <p><strong>Official name:</strong> ${country.officialName}</p>
+                <p><strong>Capital:</strong> ${country.capital}</p>
+                <p><strong>Population:</strong> ${country.population.toLocaleString()}</p>
+                <p><strong>Region:</strong> ${country.region}</p>
+            </div>
+            ${country.flagSvg
+            ? `<img class="flag" src="${country.flagSvg}" alt="${country.flagAlt}">`
+            : `<p class="note">Flag not available.</p>`
+        }
+        </div>
+    `;
+    show(countryInfoEl);
+}
 
