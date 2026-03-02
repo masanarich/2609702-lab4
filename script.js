@@ -67,22 +67,17 @@ function renderCountryInfo(country) {
 
 
 
-function renderCountryInfo(country) {
-    countryInfoEl.innerHTML = `
-        <div class="country-top">
-            <div class="country-title">
-                <h2>${country.commonName}</h2>
-                <p><strong>Official name:</strong> ${country.officialName}</p>
-                <p><strong>Capital:</strong> ${country.capital}</p>
-                <p><strong>Population:</strong> ${country.population.toLocaleString()}</p>
-                <p><strong>Region:</strong> ${country.region}</p>
-            </div>
-            ${country.flagSvg
-            ? `<img class="flag" src="${country.flagSvg}" alt="${country.flagAlt}">`
-            : `<p class="note">Flag not available.</p>`
-        }
-        </div>
-    `;
-    show(countryInfoEl);
+function renderBordersHeading(hasBorders) {
+    // We’ll inject a heading above the border cards for clarity
+    if (hasBorders) {
+        bordersEl.insertAdjacentHTML("beforebegin", `<div class="border-heading" id="border-heading">Bordering Countries</div>`);
+    } else {
+        bordersEl.insertAdjacentHTML("beforebegin", `<div class="border-heading" id="border-heading">Bordering Countries</div>`);
+    }
+}
+
+function removeBordersHeadingIfExists() {
+    const existing = document.getElementById("border-heading");
+    if (existing) existing.remove();
 }
 
