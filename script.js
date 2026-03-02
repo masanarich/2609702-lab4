@@ -81,3 +81,42 @@ function removeBordersHeadingIfExists() {
     if (existing) existing.remove();
 }
 
+
+function renderNoBorders(countryName) {
+    removeBordersHeadingIfExists();
+    renderBordersHeading(false);
+    bordersEl.innerHTML = `
+        <div class="country-card" style="grid-column: 1 / -1;">
+            <p class="note">${countryName} has no bordering countries (likely an island nation).</p>
+        </div>
+    `;
+    show(bordersEl);
+}
+
+function renderBorderCards(borderCountries) {
+    removeBordersHeadingIfExists();
+    renderBordersHeading(true);
+
+    bordersEl.innerHTML = borderCountries.map((c) => {
+        const name = c?.name?.common ?? "Unknown";
+        const flag = c?.flags?.svg ?? "";
+        return `
+            <div class="border-card">
+                ${flag ? `<img class="border-flag" src="${flag}" alt="${name} flag">` : ""}
+                <div class="border-name">${name}</div>
+            </div>
+        `;
+    }).join("");
+
+    show(bordersEl);
+}
+
+
+async function fetchJson(url) {
+    const response = await fetch(url); // Required: uses fetch()
+    if (!response.ok) {
+        // REST Countries returns 404 for unknown names
+        throw new Error(`Request failed with status ${response.status}`);
+    }
+    return response.json();
+}
