@@ -131,3 +131,76 @@ async function fetchBorderCountries(borderCodes) {
         .map((arr) => (Array.isArray(arr) ? arr[0] : null))
         .filter(Boolean);
 }
+
+// Required structure in brief: async function + try/catch + finally
+async function searchCountry(countryName) {
+    clearError();
+    hide(countryInfoEl);
+    hide(bordersEl);
+    removeBordersHeadingIfExists();
+
+    const trimmed = (countryName || "").trim();
+    if (!trimmed) {
+        setError("Please enter a country name.");
+        return;
+    }
+
+    show(spinnerEl);
+
+    try {
+        // Fetch country data by name
+        const data = await fetchJson(`${NAME_ENDPOINT}${encodeURIComponent(trimmed)}`);
+
+        if (!Array.isArray(data) || data.length === 0) {
+            throw new Error("No country data found.");
+        }
+
+        // API can return multiple matches; choose the first
+        const country = normalizeCountryFromApi(data[0]);
+
+        // Update DOM with country info (Required: innerHTML/textContent)
+        renderCountryInfo(country);
+
+        // Fetch bordering countries if present
+        if (!country.borders || country.borders.length === 0) {
+            renderNoBorders(country.commonName);
+            return;
+        }
+
+        const borderCountries = await fetchBorderCountries(country.borders);
+        if (borderCountries.length === 0) {
+            renderNoBorders(country.commonName);
+            return;
+        }
+
+        renderBorderCards(borderCountries);
+
+    } catch (error) {
+        // Friendly message for the user
+        const msg = String(error?.message || "");
+        if (msg.includes("404")) {
+            setError(`No results found for "${trimmed}". Try a different spelling.`);
+        } else {
+            setError("Something went wrong while fetching data. Please try again.");
+        }
+        console.error(error);
+    } finally {
+        hide(spinnerEl);
+    }
+}
+
+// Event listeners (Required)
+btnEl.addEventListener("click", () => {
+    const country = inputEl.value;
+    searchCountry(country);
+});
+
+// Search on Enter key press (Required)
+inputEl.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        searchCountry(inputEl.value);
+    }
+});
+
+
+searchCountry("South Africa");
