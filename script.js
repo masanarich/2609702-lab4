@@ -22,3 +22,8 @@ function setError(message) {
     errorEl.textContent = message;
     show(errorEl);
 }
+
+function clearError() {
+    errorEl.textContent = "";
+    hide(errorEl);
+}
