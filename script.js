@@ -13,3 +13,7 @@ const errorEl = document.getElementById("error-message");
 function show(el) {
     el.classList.remove("hidden");
 }
+
+function hide(el) {
+    el.classList.add("hidden");
+}
