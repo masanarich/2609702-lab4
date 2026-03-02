@@ -6,16 +6,16 @@
 }
 
 :root {
-    --bg: #0b1220;
-    --panel: rgba(255, 255, 255, 0.08);
-    --panel-strong: rgba(255, 255, 255, 0.12);
+    --bg: #ced4c0;
+    --panel: rgba(207, 64, 64, 0.08);
+    --panel-strong: #3fd04caf;
     --text: #eaf0ff;
     --muted: rgba(234, 240, 255, 0.75);
     --accent: #7c3aed;
     --accent-2: #22c55e;
-    --ring: rgba(124, 58, 237, 0.35);
-    --border: rgba(255, 255, 255, 0.14);
-    --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+    --ring: rgba(29, 214, 155, 0.03);
+    --border: rgba(26, 205, 32, 0.747);
+    --shadow: 0 18px 50px rgba(42, 193, 67, 0.45);
     --radius: 18px;
 }
 
