@@ -17,3 +17,8 @@ function show(el) {
 function hide(el) {
     el.classList.add("hidden");
 }
+
+function setError(message) {
+    errorEl.textContent = message;
+    show(errorEl);
+}
