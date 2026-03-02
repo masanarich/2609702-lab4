@@ -9,3 +9,7 @@ const spinnerEl = document.getElementById("loading-spinner");
 const countryInfoEl = document.getElementById("country-info");
 const bordersEl = document.getElementById("bordering-countries");
 const errorEl = document.getElementById("error-message");
+
+function show(el) {
+    el.classList.remove("hidden");
+}
