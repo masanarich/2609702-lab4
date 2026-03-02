@@ -46,6 +46,36 @@ function normalizeCountryFromApi(country) {
     };
 }
 
+/**
+ * Pick the "best" country from a list based on the user's query.
+ * This prevents weird results like Cook Islands for "iran".
+ */
+function pickBestMatch(list, query) {
+    const q = (query || "").trim().toLowerCase();
+    if (!Array.isArray(list) || list.length === 0) return null;
+
+    // 1) Exact match: common name
+    let best = list.find(c => c?.name?.common?.toLowerCase() === q);
+    if (best) return best;
+
+    // 2) Exact match: official name
+    best = list.find(c => c?.name?.official?.toLowerCase() === q);
+    if (best) return best;
+
+    // 3) Starts-with match on common name
+    best = list.find(c => c?.name?.common?.toLowerCase().startsWith(q));
+    if (best) return best;
+
+    // 4) Contains match on common name
+    best = list.find(c => c?.name?.common?.toLowerCase().includes(q));
+    if (best) return best;
+
+    // 5) Fallback: shortest common name usually most "main"
+    return list
+        .slice()
+        .sort((a, b) => (a?.name?.common?.length ?? 999) - (b?.name?.common?.length ?? 999))[0];
+}
+
 function renderCountryInfo(country) {
     countryInfoEl.innerHTML = `
         <div class="country-top">
@@ -65,15 +95,12 @@ function renderCountryInfo(country) {
     show(countryInfoEl);
 }
 
-
-
 function renderBordersHeading(hasBorders) {
-    // We’ll inject a heading above the border cards for clarity
-    if (hasBorders) {
-        bordersEl.insertAdjacentHTML("beforebegin", `<div class="border-heading" id="border-heading">Bordering Countries</div>`);
-    } else {
-        bordersEl.insertAdjacentHTML("beforebegin", `<div class="border-heading" id="border-heading">Bordering Countries</div>`);
-    }
+    // Inject heading above the border cards
+    bordersEl.insertAdjacentHTML(
+        "beforebegin",
+        `<div class="border-heading" id="border-heading">Bordering Countries</div>`
+    );
 }
 
 function removeBordersHeadingIfExists() {
@@ -81,10 +108,10 @@ function removeBordersHeadingIfExists() {
     if (existing) existing.remove();
 }
 
-
 function renderNoBorders(countryName) {
     removeBordersHeadingIfExists();
     renderBordersHeading(false);
+
     bordersEl.innerHTML = `
         <div class="country-card" style="grid-column: 1 / -1;">
             <p class="note">${countryName} has no bordering countries (likely an island nation).</p>
@@ -111,28 +138,26 @@ function renderBorderCards(borderCountries) {
     show(bordersEl);
 }
 
-
 async function fetchJson(url) {
     const response = await fetch(url); // Required: uses fetch()
     if (!response.ok) {
-        // REST Countries returns 404 for unknown names
         throw new Error(`Request failed with status ${response.status}`);
     }
     return response.json();
 }
 
 async function fetchBorderCountries(borderCodes) {
-    // Fetch all neighboring countries in parallel
-    const promises = borderCodes.map((code) => fetchJson(`${CODE_ENDPOINT}${encodeURIComponent(code)}`));
+    const promises = borderCodes.map((code) =>
+        fetchJson(`${CODE_ENDPOINT}${encodeURIComponent(code)}`)
+    );
     const results = await Promise.all(promises);
 
-    // alpha/{code} returns an array with one country object
     return results
         .map((arr) => (Array.isArray(arr) ? arr[0] : null))
         .filter(Boolean);
 }
 
-// Required structure in brief: async function + try/catch + finally
+// Required structure: async + try/catch + finally
 async function searchCountry(countryName) {
     clearError();
     hide(countryInfoEl);
@@ -148,20 +173,30 @@ async function searchCountry(countryName) {
     show(spinnerEl);
 
     try {
-        // Fetch country data by name
-        const data = await fetchJson(`${NAME_ENDPOINT}${encodeURIComponent(trimmed)}`);
+        let data;
+
+        // 1) Try exact/fullText match first (best accuracy)
+        try {
+            data = await fetchJson(`${NAME_ENDPOINT}${encodeURIComponent(trimmed)}?fullText=true`);
+        } catch (e) {
+            // 2) Fallback to normal search (for partial names)
+            data = await fetchJson(`${NAME_ENDPOINT}${encodeURIComponent(trimmed)}`);
+        }
 
         if (!Array.isArray(data) || data.length === 0) {
             throw new Error("No country data found.");
         }
 
-        // API can return multiple matches; choose the first
-        const country = normalizeCountryFromApi(data[0]);
+        // Pick best match instead of data[0]
+        const bestRaw = pickBestMatch(data, trimmed);
+        if (!bestRaw) throw new Error("No country data found.");
 
-        // Update DOM with country info (Required: innerHTML/textContent)
+        const country = normalizeCountryFromApi(bestRaw);
+
+        // Update DOM
         renderCountryInfo(country);
 
-        // Fetch bordering countries if present
+        // Borders
         if (!country.borders || country.borders.length === 0) {
             renderNoBorders(country.commonName);
             return;
@@ -176,7 +211,6 @@ async function searchCountry(countryName) {
         renderBorderCards(borderCountries);
 
     } catch (error) {
-        // Friendly message for the user
         const msg = String(error?.message || "");
         if (msg.includes("404")) {
             setError(`No results found for "${trimmed}". Try a different spelling.`);
