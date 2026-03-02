@@ -203,4 +203,4 @@ inputEl.addEventListener("keydown", (event) => {
 });
 
 
-searchCountry("South Africa");
+// searchCountry("South Africa");
