@@ -6,36 +6,35 @@
 }
 
 :root {
-    --bg: #ced4c0;
-    --panel: rgba(207, 64, 64, 0.08);
-    --panel-strong: #3fd04caf;
-    --text: #eaf0ff;
-    --muted: rgba(234, 240, 255, 0.75);
-    --accent: #7c3aed;
+    --bg: #f4f9f6;
+    --panel: #ffffff;
+    --panel-strong: #f1f7ff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --accent: #4f46e5;
     --accent-2: #22c55e;
-    --ring: rgba(29, 214, 155, 0.03);
-    --border: rgba(26, 205, 32, 0.747);
-    --shadow: 0 18px 50px rgba(42, 193, 67, 0.45);
+    --ring: rgba(79, 70, 229, 0.25);
+    --border: #e5e7eb;
+    --shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
     --radius: 18px;
 }
 
 body {
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-    background: radial-gradient(1000px 500px at 20% 0%, rgba(124, 58, 237, 0.25), transparent 60%),
-        radial-gradient(900px 500px at 80% 10%, rgba(34, 197, 94, 0.18), transparent 55%),
-        var(--bg);
+    background: linear-gradient(to bottom right, #e0f2fe, #f0fdf4);
     color: var(--text);
     min-height: 100vh;
 }
 
 header {
-    padding: 28px 16px 10px;
+    padding: 30px 16px 10px;
     text-align: center;
 }
 
 header h1 {
-    font-size: 2rem;
-    letter-spacing: 0.5px;
+    font-size: 2.2rem;
+    color: var(--accent);
+    font-weight: 700;
 }
 
 main {
@@ -55,7 +54,6 @@ main {
     border-radius: var(--radius);
     padding: 14px;
     box-shadow: var(--shadow);
-    backdrop-filter: blur(12px);
 }
 
 #country-input {
@@ -64,37 +62,37 @@ main {
     padding: 12px 14px;
     border-radius: 14px;
     border: 1px solid var(--border);
-    background: rgba(0, 0, 0, 0.25);
+    background: #f9fafb;
     color: var(--text);
     outline: none;
 }
 
 #country-input::placeholder {
-    color: rgba(234, 240, 255, 0.55);
+    color: var(--muted);
 }
 
 #country-input:focus {
-    border-color: rgba(124, 58, 237, 0.65);
-    box-shadow: 0 0 0 5px var(--ring);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--ring);
 }
 
 #search-btn {
-    padding: 12px 16px;
+    padding: 12px 18px;
     border-radius: 14px;
-    border: 1px solid rgba(124, 58, 237, 0.55);
-    background: linear-gradient(135deg, rgba(124, 58, 237, 0.95), rgba(34, 197, 94, 0.75));
+    border: none;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
     color: white;
     cursor: pointer;
-    font-weight: 700;
-    transition: transform 0.08s ease, filter 0.2s ease;
+    font-weight: 600;
+    transition: 0.2s ease;
 }
 
 #search-btn:hover {
-    filter: brightness(1.05);
+    opacity: 0.9;
 }
 
 #search-btn:active {
-    transform: translateY(1px) scale(0.99);
+    transform: scale(0.98);
 }
 
 /* --------- Required: Hidden state --------- */
@@ -108,11 +106,10 @@ main {
     height: 46px;
     margin: 18px auto;
     border-radius: 50%;
-    border: 4px solid rgba(255, 255, 255, 0.18);
-    border-top-color: rgba(124, 58, 237, 0.95);
+    border: 4px solid #e5e7eb;
+    border-top-color: var(--accent);
     animation: spin 1s linear infinite;
     /* Required */
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
 }
 
 @keyframes spin {
@@ -127,13 +124,12 @@ main {
 
 /* --------- Required: Country card --------- */
 .country-card {
-    margin-top: 18px;
+    margin-top: 20px;
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 18px;
+    padding: 20px;
     box-shadow: var(--shadow);
-    backdrop-filter: blur(12px);
 }
 
 .country-top {
@@ -152,34 +148,34 @@ main {
 
 .country-title h2 {
     font-size: 1.6rem;
+    color: var(--accent);
 }
 
 .country-title p {
     color: var(--muted);
-    line-height: 1.35;
+    line-height: 1.4;
 }
 
 .flag {
     width: 120px;
-    height: auto;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    border: 1px solid var(--border);
 }
 
-/* --------- Required: Border grid (grid or flex) --------- */
+/* --------- Required: Border grid --------- */
 .border-grid {
     margin-top: 16px;
     display: grid;
-    /* Required: grid or flex */
+    /* Required */
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 12px;
 }
 
 .border-heading {
-    margin-top: 14px;
-    font-size: 1.1rem;
-    color: rgba(234, 240, 255, 0.9);
+    margin-top: 18px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--accent);
 }
 
 .border-card {
@@ -187,23 +183,20 @@ main {
     align-items: center;
     gap: 10px;
     padding: 12px;
-    border-radius: 16px;
+    border-radius: 14px;
     border: 1px solid var(--border);
     background: var(--panel-strong);
-    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.25);
-    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow);
 }
 
 .border-flag {
-    width: 44px;
-    height: auto;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.16);
+    width: 40px;
+    border-radius: 8px;
 }
 
 .border-name {
-    font-weight: 700;
-    line-height: 1.2;
+    font-weight: 600;
+    color: var(--text);
 }
 
 .note {
@@ -216,11 +209,10 @@ main {
     margin-top: 14px;
     padding: 12px 14px;
     border-radius: 14px;
-    border: 1px solid rgba(239, 68, 68, 0.45);
-    background: rgba(239, 68, 68, 0.12);
-    color: #fecaca;
-    /* error color */
-    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.25);
+    border: 1px solid #fca5a5;
+    background: #fee2e2;
+    color: #991b1b;
+    box-shadow: var(--shadow);
 }
 
 /* --------- Responsive tweaks --------- */
