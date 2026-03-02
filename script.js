@@ -120,3 +120,14 @@ async function fetchJson(url) {
     }
     return response.json();
 }
+
+async function fetchBorderCountries(borderCodes) {
+    // Fetch all neighboring countries in parallel
+    const promises = borderCodes.map((code) => fetchJson(`${CODE_ENDPOINT}${encodeURIComponent(code)}`));
+    const results = await Promise.all(promises);
+
+    // alpha/{code} returns an array with one country object
+    return results
+        .map((arr) => (Array.isArray(arr) ? arr[0] : null))
+        .filter(Boolean);
+}
