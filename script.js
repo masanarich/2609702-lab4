@@ -33,7 +33,6 @@ function safeFirst(arr, fallback = "N/A") {
 }
 
 function normalizeCountryFromApi(country) {
-    // Some fields can be missing depending on API response
     return {
         commonName: country?.name?.common ?? "Unknown",
         officialName: country?.name?.official ?? "Unknown",
@@ -48,29 +47,23 @@ function normalizeCountryFromApi(country) {
 
 /**
  * Pick the "best" country from a list based on the user's query.
- * This prevents weird results like Cook Islands for "iran".
  */
 function pickBestMatch(list, query) {
     const q = (query || "").trim().toLowerCase();
     if (!Array.isArray(list) || list.length === 0) return null;
 
-    // 1) Exact match: common name
     let best = list.find(c => c?.name?.common?.toLowerCase() === q);
     if (best) return best;
 
-    // 2) Exact match: official name
     best = list.find(c => c?.name?.official?.toLowerCase() === q);
     if (best) return best;
 
-    // 3) Starts-with match on common name
     best = list.find(c => c?.name?.common?.toLowerCase().startsWith(q));
     if (best) return best;
 
-    // 4) Contains match on common name
     best = list.find(c => c?.name?.common?.toLowerCase().includes(q));
     if (best) return best;
 
-    // 5) Fallback: shortest common name usually most "main"
     return list
         .slice()
         .sort((a, b) => (a?.name?.common?.length ?? 999) - (b?.name?.common?.length ?? 999))[0];
@@ -95,8 +88,9 @@ function renderCountryInfo(country) {
     show(countryInfoEl);
 }
 
-function renderBordersHeading(hasBorders) {
-    // Inject heading above the border cards
+function renderBordersHeading() {
+    // Ensure we don't duplicate the heading
+    removeBordersHeadingIfExists();
     bordersEl.insertAdjacentHTML(
         "beforebegin",
         `<div class="border-heading" id="border-heading">Bordering Countries</div>`
@@ -109,8 +103,7 @@ function removeBordersHeadingIfExists() {
 }
 
 function renderNoBorders(countryName) {
-    removeBordersHeadingIfExists();
-    renderBordersHeading(false);
+    renderBordersHeading();
 
     bordersEl.innerHTML = `
         <div class="country-card" style="grid-column: 1 / -1;">
@@ -121,8 +114,7 @@ function renderNoBorders(countryName) {
 }
 
 function renderBorderCards(borderCountries) {
-    removeBordersHeadingIfExists();
-    renderBordersHeading(true);
+    renderBordersHeading();
 
     bordersEl.innerHTML = borderCountries.map((c) => {
         const name = c?.name?.common ?? "Unknown";
@@ -136,6 +128,23 @@ function renderBorderCards(borderCountries) {
     }).join("");
 
     show(bordersEl);
+}
+
+/**
+ * ✅ NEW: Reset UI so old results never remain on screen.
+ * Call this at the start of a search AND when errors happen.
+ */
+function resetResultsUI() {
+    // Clear previous content
+    countryInfoEl.innerHTML = "";
+    bordersEl.innerHTML = "";
+
+    // Hide result sections
+    hide(countryInfoEl);
+    hide(bordersEl);
+
+    // Remove heading
+    removeBordersHeadingIfExists();
 }
 
 async function fetchJson(url) {
@@ -160,9 +169,7 @@ async function fetchBorderCountries(borderCodes) {
 // Required structure: async + try/catch + finally
 async function searchCountry(countryName) {
     clearError();
-    hide(countryInfoEl);
-    hide(bordersEl);
-    removeBordersHeadingIfExists();
+    resetResultsUI();
 
     const trimmed = (countryName || "").trim();
     if (!trimmed) {
@@ -175,11 +182,11 @@ async function searchCountry(countryName) {
     try {
         let data;
 
-        // 1) Try exact/fullText match first (best accuracy)
+        // 1) Try exact match first
         try {
             data = await fetchJson(`${NAME_ENDPOINT}${encodeURIComponent(trimmed)}?fullText=true`);
         } catch (e) {
-            // 2) Fallback to normal search (for partial names)
+            // 2) Fallback to normal search
             data = await fetchJson(`${NAME_ENDPOINT}${encodeURIComponent(trimmed)}`);
         }
 
@@ -187,13 +194,14 @@ async function searchCountry(countryName) {
             throw new Error("No country data found.");
         }
 
-        // Pick best match instead of data[0]
         const bestRaw = pickBestMatch(data, trimmed);
-        if (!bestRaw) throw new Error("No country data found.");
+        if (!bestRaw) {
+            throw new Error("No country data found.");
+        }
 
         const country = normalizeCountryFromApi(bestRaw);
 
-        // Update DOM
+        // Show country info
         renderCountryInfo(country);
 
         // Borders
@@ -203,6 +211,7 @@ async function searchCountry(countryName) {
         }
 
         const borderCountries = await fetchBorderCountries(country.borders);
+
         if (borderCountries.length === 0) {
             renderNoBorders(country.commonName);
             return;
@@ -211,6 +220,9 @@ async function searchCountry(countryName) {
         renderBorderCards(borderCountries);
 
     } catch (error) {
+        // ✅ IMPORTANT: ensure nothing from previous search remains
+        resetResultsUI();
+
         const msg = String(error?.message || "");
         if (msg.includes("404")) {
             setError(`No results found for "${trimmed}". Try a different spelling.`);
@@ -235,6 +247,5 @@ inputEl.addEventListener("keydown", (event) => {
         searchCountry(inputEl.value);
     }
 });
-
 
 // searchCountry("South Africa");
