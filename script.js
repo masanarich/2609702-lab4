@@ -27,3 +27,23 @@ function clearError() {
     errorEl.textContent = "";
     hide(errorEl);
 }
+
+function safeFirst(arr, fallback = "N/A") {
+    return Array.isArray(arr) && arr.length > 0 ? arr[0] : fallback;
+}
+
+function normalizeCountryFromApi(country) {
+    // Some fields can be missing depending on API response
+    return {
+        commonName: country?.name?.common ?? "Unknown",
+        officialName: country?.name?.official ?? "Unknown",
+        capital: safeFirst(country?.capital, "N/A"),
+        population: typeof country?.population === "number" ? country.population : 0,
+        region: country?.region ?? "N/A",
+        borders: Array.isArray(country?.borders) ? country.borders : [],
+        flagSvg: country?.flags?.svg ?? "",
+        flagAlt: `${country?.name?.common ?? "Country"} flag`
+    };
+}
+
+
